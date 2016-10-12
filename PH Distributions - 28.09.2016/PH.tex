@@ -1,0 +1,571 @@
+\documentclass[envcountset]{beamer}
+%
+% Choose how your presentation looks.
+%
+% For more themes, color themes and font themes, see:
+% http://deic.uab.es/~iblanes/beamer_gallery/index_by_theme.html
+
+
+\mode<presentation>
+{
+  \usetheme{default}      % or try Darmstadt, Madrid, Warsaw, ...
+  \usecolortheme{default} % or try albatross, beaver, crane, ...
+  \usefonttheme{}  % or try serif, structurebold, ...
+  \setbeamertemplate{navigation symbols}{}
+  \setbeamertemplate{caption}[numbered]
+  \setbeamertemplate{footline}[frame number]
+} 
+\usepackage{units}
+\usepackage{mathtools}
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{amssymb,amsmath,amsthm, amsmath}  % use mathematical symbols
+\usepackage{bbold}
+\usepackage{framed}
+\usepackage{comment}
+\usepackage[%
+	font={small, sf},
+	labelfont=bf,
+	format=hang,
+	format=plain,
+	margin=0pt,
+	width=0.8\textwidth,
+]{caption}
+\usepackage[list=true]{subcaption}
+
+\usepackage{tikz}
+\usetikzlibrary{matrix, arrows,positioning, fit, automata, calc}
+\usepackage[absolute,overlay]{textpos}
+\theoremstyle{definition}
+\newtheorem{mydef}{Def.}[theorem]
+
+
+\newenvironment{proenv}{\only{\setbeamercolor{local structure}{fg=green}}}{}
+
+
+
+\title[PH Distributions]{Phase-type distributions}
+\subtitle{}
+\author{Fernando Zepeda}
+\institute{TU Berlin - Lufthansa Systems}
+\date{\today}
+
+%source macro for the images
+
+\setbeamercolor{framesource}{fg=gray}
+\setbeamerfont{framesource}{size=\tiny}
+\newcommand{\source}[1]{\begin{textblock*}{4cm}(8.7cm,8.6cm)
+
+    \begin{beamercolorbox}[ht=0.5cm,right]{framesource}
+        \usebeamerfont{framesource}\usebeamercolor[fg]{framesource} Source: {#1}
+    \end{beamercolorbox}
+\end{textblock*}}
+%----------------------------------------
+
+\begin{document}
+
+\begin{frame}[noframenumbering, plain]
+  \titlepage
+
+
+\end{frame}
+
+% Uncomment these lines for an automatically generated outline.
+\begin{frame}{Outline}
+  \tableofcontents
+\end{frame}
+
+\section{Introduction}
+
+\begin{frame}{Introduction}
+
+Some data do not follow necessarily the form of any standard distribution (unconventional forms):
+	\begin{itemize}
+	\item Probability distributions may posses any shape
+	\item Rugged and multimodal data distributions
+	\end{itemize}
+
+\vspace{0.3cm}
+
+The \textbf{phase-type (PH)} family of distributions have some useful properties in fitting this kind of data
+	\begin{itemize}
+	\item They are dense in the field of all positive-valued distributions $[ 0,\infty)$
+	\item Thus, they can be used to approximate any positive-valued distribution Bladt. et al. (2003)
+	\item Markovian properties make them analytically flexible
+	\end{itemize}
+
+\end{frame}
+\begin{frame}{Motivation}
+
+\textbf{Goal}: 
+Estimate
+\begin{itemize}
+\item Buying probabilities (and ticketing probabilities)
+\item Inter-arrival time of bookings
+\end{itemize}
+
+by fitting PH distributions to them given booking historical data 
+
+\end{frame}
+
+\section{Markov Chains}
+
+\begin{frame}{Markov Chains}
+
+Let $\mathbf{S}$ denote a countable set of states, and let $\{X(t)\}_{t\geq0}^{\infty}$ be a stochastic process with state space $\mathbf{S}$
+
+	\begin{itemize}
+	\item Let $n \in \mathbb{N}$ be the size of $\mathbf{S}$
+	\end{itemize}
+
+$\{X(t)\}_{t\geq0}^{\infty}$ is a continuous-time Markov chain \textbf{(CTMC)}, if it is characterized by the \textit{Markov property}: 
+\\[10pt]
+\centering
+\begin{framed}
+	$Prob(X(t_{k+1})=  x_{k+1} | X(t_k) = x_k, \ldots, X(t_0) = x_0) =$
+	\\[4pt]
+	$Prob(X(t_{k+1}) = x_{k+1} | X(t_k) = x_k)$
+\end{framed}
+
+for any $t_{k+1} \geq t_{k} \geq \ldots \geq t_1 \geq t_0 \geq 0 $ and $x_l \in \mathbf{S}$
+\end{frame}
+
+\begin{frame}{}
+
+The transition between states $x$ are defined by the values $p_t(i,j)$ which are contained in a matrix with transition probabilities $\mathbf{P_t}$
+\\[10pt]
+\begin{framed}
+The state probabilities at time $t$ are denoted by 
+\\[5pt]
+\centering
+$p_t(j) = Prob(X(t) = j), j \in \mathbf{S}$ with $\sum_j p_t(j)=1$
+\\[10pt]
+$\pi(0) = [ p_0(1), p_0(2), \ldots, p_0(n)]$: initial probability vector 
+\end{framed}
+\centering
+\flushleft
+Random times between states transitions $V_1, V_2, \ldots, V_n$ are exponentially distributed random variables with parameter $\lambda(i)$ for state $i$
+\flushleft
+$V_i$: holding time in state $i$ with distribution function:
+$$Prob(V_i \leq t) = 1 - e^{-\lambda(i)t}, t \geq 0$$
+\end{frame}
+
+
+\begin{frame}{}
+
+The probabilistic behavior if the CTMC can be summarize in terms of its \underline{infinitesimal generator}: a $n\times n$ matrix $\mathbf{Q}$ with components:
+
+$$
+\mathbf{Q(i,j)} = 
+\begin{cases}
+  -\lambda(i)           & \text{if}\ i = j	,\\
+  \phantom{-}\lambda(i,j) & \text{if}\ i \neq j .
+
+\end{cases}
+$$
+
+\begin{framed}
+\begin{itemize}
+\item Since $\lambda(i) \geq 0$, it follows $\mathbf{Q}(i,i) \leq 0$: \textit{diagonal elements are non-positive}
+\item Transition to $j$ feasible in state $i$ then $\mathbf{Q}(i,j) > 0$, otherwise $\mathbf{Q}(i,j) = 0$: \textit{non-diagonal elements must be non-negative}
+\item $\sum_j\mathbf{Q}(i,j) = 0$
+\end{itemize}
+\end{framed}
+
+\end{frame}
+
+\begin{frame}{Absorbing Markov Chains}
+\begin{figure}
+\centering
+\subcaptionbox[CTMC]{%
+		\centering
+		CTMC with transient states only%
+      		\label{subfig:CTMC}%
+}[
+	0.40\textwidth
+]
+{
+	\begin{tikzpicture}[node distance = 3cm, ->, >=latex, auto, every edge/.append style={thick}]
+	\node[state] (1) {$1$};
+	\node[state] (2)[right of =1]{$2$};
+	\path (1) edge[bend left] node{$4$} (2)
+	
+	  	(2) edge[bend left] node{$2$} (1);
+\end{tikzpicture}
+
+}
+\hspace{0.1\textwidth}
+\subcaptionbox[Short Subcaption]{%
+		\centering
+		CTMC with one absorbing state%
+      		\label{subfig:sublabel2}%
+}[
+	0.40\textwidth
+]
+{
+\begin{tikzpicture}[node distance = 2.5cm, ->, >=latex, auto, every edge/.append style={thick}]
+	\node[state](1) {$1$};
+	\node[state](2)[right of =1]{$2$};
+	\coordinate(Middle) at ($(1)!0.5!(2)$);
+	\node[state, accepting](3)[below of =Middle]{$3$};
+	
+	\path  (1) edge[bend left] node{$4$} (2)
+		  (2) edge[bend left] node{$2$} (1)
+		  (2) edge[bend left] node{$\nicefrac{1}{2}$} (3)
+		  (1) edge[bend right, left] node{$\nicefrac{1}{2}$} (3);
+\end{tikzpicture}
+}
+
+\caption[Short Caption]{\centering Different Markov chains and their transition representation}
+\label{fig:label}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Absorbing Markov Chains}
+	\framesubtitle{Some definitions}
+
+A state $j$ is reachable from another $i$ when we have 
+
+$$p_t(i,j) = Prob(X(t+u) = j | X(u) = i) > 0$$
+for some $t$
+
+\begin{mydef} 
+States $i$ and $j$ can communicate with each other if $i$ is reachable from $j$ and viceversa.
+\end{mydef}
+\vspace{5pt}
+Let $\mathbf{C} \subset \mathbf{S}$. If all states in $\mathbf{C}$ communicate, we call it communicating set 
+
+\begin{mydef}
+A subset $\mathbf{C}$ of the state space $\mathbf{S}$ is said to be closed if $\mathbf{P}(i,j) = 0$ for any $i \in \mathbf{C}, j \not\in \mathbf{C}$.
+\end{mydef}
+
+\end{frame}
+
+\begin{frame}
+\hspace{5pt} If $\mathbf{C}$ consists of a single state, say $i$, then $i$ is said to be an absorbing state. 
+\begin{framed}
+It holds for $i$ that $\mathbf{P}(i,i) = 1$: \textit{a process can never leave a closed set after entering it}
+\end{framed}
+\begin{mydef}
+A state $i \in \mathbf{S}$ is transient, if the probability of returning to $i$ after leaving it is less than 1.
+\end{mydef}
+
+\end{frame}
+
+\section{Phase-type distributions}
+
+\begin{frame}{PH distributions and absorbing Markov chains}
+
+If every state in a Markov chain is either absorbing or transient, then the Markov chain is called \textit{absorbing Markov chain}
+
+\begin{framed}
+	Particularly interesting case: absorbing Markov chains with one single absorbing state
+\end{framed}
+
+\underline{Assumption}: state space $\mathbf{S}$ of the continuous time absorbing Markov process $\{X(t)\}_{t\geq0}^{\infty}$ is finite and contains the set of \textbf{transient} states $\mathbf{S}_T = \{1, \ldots, n\}$ and a single absorbing state $n+1$
+
+\end{frame}
+
+\begin{frame}[fragile]
+\Large
+
+\[ \mathbf{Q} = 
+\begin{tikzpicture}[baseline=-0.5]
+
+\matrix[matrix of math nodes, left delimiter = (, right delimiter = ) ](m){
+\mathbf{D_0} & \mathbf{d_1}\\
+\mathbf{0} & 0\\
+};
+\node<2>[label={\tiny $n\times 1$},fit=(m-1-2), rounded corners, draw=blue, scale=.6]{};
+\node<2>[label={\tiny $n\times n$},fit=(m-1-1), draw=red, scale=.6]{};
+\node<2>[label=below:{\tiny $1\times n$},fit=(m-2-1), draw=green, scale=.6]{};
+\node<2>[label=below:{\tiny $1\times 1$},fit=(m-2-2), draw=violet, scale=.6]{};
+\end{tikzpicture}
+\]
+
+\normalsize
+is the generator matrix, where:
+
+\begin{itemize}
+\item $\mathbf{D_0}$: describes transitions between transient states
+\item $\mathbf{d_1}$: transition from transient states to the absorbing state
+\item row vector $\mathbf{0}$: since no transition from the absorbing state to the transient states
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+Since the states are transient, implies:
+
+$$\lim_{t\to\infty} Prob(X(t)<n+1)=0,$$
+
+i.e. the absorption occurs with probability 1.
+
+\vspace{5pt}
+
+$\mathbf{D_0}$ is invertible and matrix $(-\mathbf{D_0})^{-1}$ is the fundamental matrix of the absorbing CTMC 
+\begin{framed}
+\begin{block}{Def. Phase-type distribution (PHD)}
+
+A PHD is defined as the distribution of the lifetime $X$ or the time to absorption from the set of transient states $\mathbf{S_T}$ of an absorbing continuous Markov process $\{X(t)\}_{t\geq0}^{\infty}$
+
+\end{block}
+\end{framed}
+\end{frame}
+
+\begin{frame}{Phase Type Distributions (PHD)}
+
+The Markov process starts in an arbitrary state from $\mathbf{S}=\mathbf{S_T} \cup \mathbf{S_A}$, so the vector 
+$$\pi=[\pi(1),\ldots,\pi(n)]$$
+
+represents the inital probabilites for transient states and $\pi(n+1)$ gives the probability for a direct start in the absorbing (assumption: $\pi(n+1)=0$)
+\end{frame}
+
+\begin{frame}{Phase Type Distributions (PHD)}
+\framesubtitle{Simple example}
+
+$\mathbf{S}=\mathbf{S_T} \cup \mathbf{S_A} = \{1,2\} \cup \{3\}$
+
+\begin{minipage}[c]{0.45\textwidth}
+	\begin{minipage}[c]{1.\textwidth}
+	\begin{equation*}
+	\mathbf{Q} =
+	\left(
+	\begin{array}{cc|c}
+	-4.5 & 4 & 0.5 \\
+	2 & -2.5 &0.5\\
+	\hline
+	0 &0 &0 \\
+	\end{array}
+	\right)
+	%%
+	\end{equation*}
+	\end{minipage}
+	\vfill
+	\begin{minipage}{1.\textwidth}
+	\flushright
+	\begin{equation*}
+	\pi=[\frac{1}{2},  \frac{1}{2}]
+	\end{equation*}
+	\end{minipage}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.45\textwidth}
+\begin{tikzpicture}[node distance = 2.5cm, ->, >=latex, auto, every edge/.append style={thick}]
+	\node[state, initial, initial text={$\nicefrac{1}{2}$}, initial where=above](1) {$1$};
+	\node[state, initial, initial text={$\nicefrac{1}{2}$},initial where=above](2)[right of =1]{$2$};
+	\coordinate(Middle) at ($(1)!0.5!(2)$);
+	\node[state, accepting](3)[below of =Middle]{$3$};
+	
+	\path  (1) edge[bend left] node{$4$} (2)
+		  (2) edge[bend left] node{$2$} (1)
+		  (2) edge[bend left] node{$\nicefrac{1}{2}$} (3)
+		  (1) edge[bend right, left] node{$\nicefrac{1}{2}$} (3);
+\end{tikzpicture}
+\end{minipage}
+
+\end{frame}
+
+\begin{frame}{PHD Representation}
+
+We can say now that the random variable $X$ describing the time until absorption is of phase-type with the vector-matrix tuple representation:
+
+$$(\pi, \mathbf{D_0})$$
+
+since the vectors $\mathbf{d_1}$ and the value $\pi(n+1)$ are implicitly given by the matrix $\mathbf{D_0}$
+
+\vspace{10pt}
+The size of the PHD is the size of the sub-generator matrix $\mathbf{D_0}$, $n$
+
+\end{frame}
+
+\begin{frame}{Analytical Properties of PHD}
+$$F(x) = \mathbb{1} - \pi e^{\mathbf{D_0}x}\mathbb{1}, \text{ for }  x \geq 0 \text{ (c.d.f.)}$$
+
+$$f(x) = \pi e^{\mathbf{D_0}x}\mathbf{d_1}, \text{ for }  x \geq 0 \text{   (p.d.f.)}$$
+
+$$\mu_i=E[X^i]=i ! \pi \mathbf{(-D_0^{-1})}^i \mathbb{1}, \text{ PHD $i$th moment } $$
+
+\vspace{10pt}
+
+Note 1: $\mathbf{M} = \mathbf{-D_0^{-1}}$ is the moment matrix
+$$\rightarrow \mu_i=E[X^i]=i ! \pi \mathbf{\mathbf{M}}^i \mathbb{1}$$
+
+Note 2: $\mathbf{-D_0^{-1}}(i,j)=\mathbf{M}(i,j)$ is the expected total time spent in phase $j$ before absorption, given that initial phase is $i$
+
+\end{frame}
+
+\section{Classes}
+\begin{frame}{PH Classes}
+
+Based on the structure of the underlying Markov chain several classes of PH distributions can be distinguished
+
+	\begin{itemize}
+	\item Structure of PH representation often has an impact on its application
+	\item Some structures allow more efficient solutions
+	\end{itemize}
+
+Most important distinction: 
+
+	\begin{enumerate}
+	\item\textcolor<2,3>{blue}{Acyclic phase-type distributions (APH)}
+		\onslide<3>{
+		\begin{itemize}
+		\item Hyper-Erlang distributions 
+		\item Hyper-Exponential distributions
+		\end{itemize}}
+	\item General phase-type distributions
+	\end{enumerate}
+
+
+\end{frame}
+\begin{frame}{Hyper-Erlang distributions (HEr PHD)}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[minimum size=1pt, node distance = 2cm, ->, >=latex, auto, every edge/.append style={thick}]
+	\node[state, initial, initial text={$\beta_1$}](1) {$$};
+	\node[state](2)[right of =1]{$$};
+	\node[state](3)[right of =2]{$$};
+	\node[state, initial, initial text={$\beta_2$}](4)[below of =1]{$$};
+	\node[state](5)[right of =4]{$$};
+	\coordinate(medio) at ($(5)!0.9!(3)$);
+		\coordinate(Middle) at ($(1)!0.5!(4)$);
+	\node[state, accepting](6)[right of =medio]{$$};
+	
+	\path  (1) edge node{$\lambda_1$} (2)
+		  (2) edge node{$\lambda_1$} (3)
+		  (3) edge[above] node{$\lambda_1$} (6)
+		  (4) edge[below] node{$\lambda_2$} (5)
+		  (5) edge[below] node{$\lambda_2$} (6);
+\end{tikzpicture}
+\caption{Hyper-Erlang distribution with two branches $(\beta, m, \mathbf{b}, \lambda)$ = $([\beta_1, \beta_2], 2, [3,2], [\lambda_1, \lambda_2])$ }
+\end{figure}
+
+Size of the Hyper-Erlang distribution: $n = \mathbf{b}\mathbb{1}$
+
+\vspace{5pt}
+\underline{Special case}: 
+$(\beta, m, \mathbf{b}, \lambda) = ([\beta_1=1], 1, \mathbf{b}, \lambda_1)$ 
+$\rightarrow$ Erlang distr. 
+
+\end{frame}
+\begin{frame}{Hyper-Exponential distributions (HEx PHD)}
+\begin{figure}
+\centering
+\begin{tikzpicture}[minimum size=1pt, node distance = 2cm, ->, >=latex, auto, every edge/.append style={thick}]
+	\node[state, initial, initial text={$\beta_1$},  initial where=below](1) {$$};
+	\node[state, initial, initial text={$\beta_2$}, initial where=below](2)[right of =1]{$$};
+	\node[state, initial, initial text={$\beta_3$}, initial where=below](3)[right of =2]{$$};
+	\node[state, initial, initial text={$\beta_4$}, initial where=below](4)[right of =3]{$$};
+	\node[state, accepting](5)[right of =4]{$$};
+	
+	\path  (1) edge[bend left] node{$\lambda_1$} (5)
+		  (2) edge[bend left, right] node[above,pos=0.1] {$\lambda_2$} (5)
+		  (3) edge[bend right] node[above, pos=0.2]{$\lambda_3$} (5)
+		  (4) edge node{$\lambda_4$} (5);
+\end{tikzpicture}
+\caption{Hyper-Exponential distribution with four branches $(\beta, n, \lambda)$ = $([\beta_1, \beta_2, \beta_3, \beta_4], 4, [\lambda_1, \lambda_2, \lambda_3, \lambda_4])$}
+\end{figure}
+
+\underline{Special case}: $(\beta, n, \lambda) = ([\beta=1], 1, \lambda_1) \rightarrow$ Exponential distr.
+
+\vspace{5pt}
+Note: HEx are subclass of HEr when $\mathbf{b}=\mathbb{1} \text{ and } \mathbf{m}=n$ 
+
+\end{frame}
+
+\section{Canonical Representations}
+
+\begin{frame}{Canonical Representation for APH distributions}
+\framesubtitle{CF-1}
+
+\begin{mydef}
+The Canonical Form 1 (CF-1 form) is a bi-diagonal representation $(\beta, \Lambda)$, where $\beta$ initial probabilities and rates $\lambda_i$ in $\Lambda$ are in increasing order: $\lambda_1 \leq \lambda_2 \leq \ldots \leq \lambda_n$
+\end{mydef}
+
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[minimum size=1pt, node distance = 2cm, ->, >=latex, auto, every edge/.append style={thick}]
+	\node[state, initial, initial text={$\beta_1$},  initial where=below](1) {$$};
+	\node[state, initial, initial text={$\beta_2$}, initial where=below](2)[right of =1]{$$};
+	\node[state, initial, initial text={$\beta_3$}, initial where=below](3)[right of =2]{$$};
+	\node[state, initial, initial text={$\beta_4$}, initial where=below](4)[right of =3]{$$};
+	\node[state, accepting](5)[right of =4]{$$};
+	
+	\path  (1) edge node{$\lambda_1$} (2)
+		  (2) edge node{$\lambda_2$} (3)
+		  (3) edge node{$\lambda_3$} (4)
+		  (4) edge node{$\lambda_4$} (5);
+\end{tikzpicture}
+\caption{APH distribution in CF-1 form}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Canonical Representation for APH distributions}
+
+\begin{framed}
+Every acyclic phase type distribution (APH) with a Markovian representation of size $n$ has an unique CF-1 representation of the same size.
+\end{framed}
+\begin{itemize}
+\item A general APH has $n-1$ initial probabilities and $n^2$ entries in the sub-generator matrix $\mathbf{D_0}$, i.e. the number of parameters is $n^2+n-1$
+
+\item In the CF-1 form $\mathbf{D_0}$ is an upper bi-diagonal matrix with $\lambda_{i,i}=-\lambda_{i+1,i}$, therefore the CF-1 form has $2n-1$ parameters
+\end{itemize}
+\end{frame}
+
+\begin{frame}{PH-Fitting Tools}
+Two general classes of algorithms
+\begin{itemize}
+\item Analytical: direct computation of parameters
+	\begin{itemize}
+	\item Moment Matching: $\mu_1, \mu_2, \mu_3$ 
+	\end{itemize}
+\item Statistical: maximum likelihood method (iterative process)
+	\begin{itemize}
+	\item G-FIT: Hyper-Erlang distributions
+	\item PhFit: Acyclic PHD CF-1 form  
+	\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Summary}
+
+\begin{itemize}
+\item PHD can be used to approximate any positive-valued distribution
+\item They represent the distribution of the time to absorption of an absorbing continuous time Markov process $\{X(t)\}_{t\geq0}^{\infty}$ 
+\item They are defined by the tuple $(\pi, \mathbf{D_0})$
+\item Two big families: Hyper-Erlang and Hyper-Exponential distributions
+\item Acyclic phase-type distributions deserve an special attention
+\item They can be reduced in a canonical form in order to estimate their parameters $(2n-1)$
+\item Fitting techniques
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[noframenumbering, plain]{References}
+
+\begin{thebibliography}{2}
+\footnotesize{
+\setbeamertemplate{bibliography item}[book]
+\bibitem{A} Bucholtz, Kriege \& Felko (2014). Input Modeling with Phase-Type Distributions and Markov Models: Theory and Applications 
+\setbeamertemplate{bibliography item}[article]
+\bibitem{A} Cumani, A (1982). On the canonical representation of homogeneous Markov processes modelling failure-time distributions microelectronics and reliability 22. 582-602.
+\setbeamertemplate{bibliography item}[article]
+\bibitem{B} Reinicke, P \& Horváth G. (2012). Phase-type distributions for realistic modeling in discrete-event simulation. \textit{In Proceedings of the 5th International ICST Conference on Simulation Tools and Techniques} (pp.283-290). ICST (Institute for Computer Sciences, Social-Informatics and Telecommunications Engineering).}
+
+\end{thebibliography}
+
+\end{frame}
+
+
+
+
+\end{document}
+
+              

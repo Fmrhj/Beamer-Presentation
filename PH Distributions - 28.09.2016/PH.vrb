@@ -1,0 +1,25 @@
+\Large
+
+\[ \mathbf{Q} =
+\begin{tikzpicture}[baseline=-0.5]
+
+\matrix[matrix of math nodes, left delimiter = (, right delimiter = ) ](m){
+\mathbf{D_0} & \mathbf{d_1}\\
+\mathbf{0} & 0\\
+};
+\node<2>[label={\tiny $n\times 1$},fit=(m-1-2), rounded corners, draw=blue, scale=.6]{};
+\node<2>[label={\tiny $n\times n$},fit=(m-1-1), draw=red, scale=.6]{};
+\node<2>[label=below:{\tiny $1\times n$},fit=(m-2-1), draw=green, scale=.6]{};
+\node<2>[label=below:{\tiny $1\times 1$},fit=(m-2-2), draw=violet, scale=.6]{};
+\end{tikzpicture}
+\]
+
+\normalsize
+is the generator matrix, where:
+
+\begin{itemize}
+\item $\mathbf{D_0}$: describes transitions between transient states
+\item $\mathbf{d_1}$: transition from transient states to the absorbing state
+\item row vector $\mathbf{0}$: since no transition from the absorbing state to the transient states
+\end{itemize}
+
